@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Remainder Interest &amp; Life Estate Value Calculator</title>
+
+<!-- ---------- Page metadata ---------- -->
+<meta name="description" content="Free calculator that estimates the value of remainder interests and a life estates in real property. Estimate is calculated from age, property value, depreciation, and interest rate assumptions. Information defining relevant terms, along with explanations of factors that may influence the market value of deeded remainder interests.">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Jake">
+<link rel="canonical" href="https://remainderinterest.github.io/">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Remainder Interest &amp; Life Estate Value Calculator">
+<meta property="og:description" content="Estimate the value of your remainder interest or life estate in real property. Learn about the factors that influence its value and how much it could fetch in a sale.">
+<meta property="og:url" content="https://remainderinterest.github.io/">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Remainder Interest &amp; Life Estate Value Calculator">
+<meta name="twitter:description" content="Estimate the value of your remainder interest or life estate in real property. Learn about the factors that influence its value and how much it could fetch in a sale.">
+
+<!-- Site icon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏡</text></svg>">
+
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Who are you?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Good question. I’m an amateur data analyst who loves tackling difficult problems. I previously worked as an investor for nonprofit foundations and love learning about unusual assets. I believe it should be easier to buy and sell deeded remainder interests, which have existed for hundreds of years. I seek to build a portfolio of remainder interests, while hopefully connecting potential sellers with additional interested buyers (if this is you, reach out to me). I’m one person with a very patient wife, a day job, and a foster cat; there’s no private equity or startup funding involved here." }
+    },
+    {
+      "@type": "Question",
+      "name": "What are remainder interests?",
+      "acceptedAnswer": { "@type": "Answer", "text": "A remainder interest is the deeded right to possess a property, following the end of a life estate. Remainder interests are typically created in estate planning when a person gifts, donates, or sells a home while maintaining the right to live in the home for a lifetime (a ‘life estate’). Unlike a declaration in a will, remainder interests are typically irrevocable and assignable." }
+    },
+    {
+      "@type": "Question",
+      "name": "What is a life estate?",
+      "acceptedAnswer": { "@type": "Answer", "text": "A life estate is the right to use and occupy a property for a lifetime. When the life estate ends, the property passes along (in ‘as-is’ condition) to the holder of the remainder interest. A life estate may span the lives of two occupants, in which case the life estate will continue for the length of the longer lifetime." }
+    },
+    {
+      "@type": "Question",
+      "name": "How does the calculator work?",
+      "acceptedAnswer": { "@type": "Answer", "text": "As well as it can! The calculator applies simplified actuarial methods that consider life expectancy, the time value of money (via interest rate assumptions), and the rate of property depreciation. The calculation is similar to those referenced in IRS rules, publications, and guidance but is not an implementation of any tax rule or professional valuation methodology. It should not be relied upon or used in place of professional advice. It only expresses my personal opinion on what a hypothetical property interest may be worth, providing directional approximation for a set of input characteristics." }
+    },
+    {
+      "@type": "Question",
+      "name": "Why are land and building values split?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Land does not depreciate, so the difference in value between current and future use reflects differences in time value. A building wears out over long periods of time and passes along in ‘as-is’ condition. Therefore, in addition to greater time value, the life estate gets more benefit from the remaining useful life of the building than the remainder interest does. In order to enjoy the house in its current condition, the remainder interest holder will have to pay for renovations equivalent to the depreciation that occurs in the meantime." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can all remainder interests be sold?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No, certain remainder interests may be revoked by the life estate holder. This may apply in Texas, Florida, Texas, Michigan, West Virginia, and Vermont. Fractional remainder interests may also be tricky. Local law, property condition, deed terms, and geographic factors will determine whether a remainder interest actually has marketable value." }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the interest rate assumption?",
+      "acceptedAnswer": { "@type": "Answer", "text": "The calculator relies on a fixed interest rate assumption that I periodically update. It broadly mirrors the IRS Section 7520 rate, with the addition of a funding spread. This spread is included to account for delayed updates (sorry!), an upward sloping U.S. Treasury yield curve, and the difference between market cost of capital and the IRS statutory rate. It incorporates a buffer for illiquidity and unique risks that must be continually monitored, such as total loss from foreclosure if the life estate holder lapses on property tax bills. The funding spread nudges the calculation toward marketable reality, while also discouraging you from inappropriately relying on it for tax purposes." }
+    },
+    {
+      "@type": "Question",
+      "name": "I’m older than 105.",
+      "acceptedAnswer": { "@type": "Answer", "text": "Congratulations! That’s an incredible accomplishment; unfortunately, I can only maintain the calculator for the most common potential inputs. If it fails to work for you, please reach out to me 🎂" }
+    }
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"WebApplication",
+  "name":"Remainder Interest & Life Estate Value Calculator",
+  "applicationCategory":"FinanceApplication",,
+  "description":"Estimate the value of your remainder interest or life estate in real property. Learn about the factors that influence its value and how much it could fetch in a sale."
+}
+</script>
+
+<style>
+  :root {
+    /* Palette */
+    --accent:        #d9822b;
+    --accent-dark:   #c4741f;
+    --accent-soft:   #fff6ec;
+    --navy:          #1f3a5f;
+    --green:         #2e7d5b;
+    --green-dark:    #256b4d;
+    --green-darker:  #1f5c43;
+    --green-tint:    #eafaf2;
+    --green-text:    #d7f0e4;
+    --green-border:  #bfe3d1;
+
+    --seg-use:       #6fa3c9;
+    --seg-dep:       #456e8c;
+
+    --white:         #fff;
+    --text:          #222;
+    --text-soft:     #444;
+    --text-muted:    #667;
+    --text-faint:    #98a2b0;
+
+    --page-bg:       #dde5ef;
+    --card-bg:       #fff;
+    --panel-bg:      #f8fafc;
+    --panel-bg-2:    #f4f7fb;
+
+    --hairline:      #eef1f5;
+    --border:        #e3e9f0;
+    --border-soft:   #e6ecf3;
+    --rule:          #b8c2ce;
+    --input-border:  #ccc;
+    --bar-border:    #d9d9d9;
+    --zero-bg:       #cfd6de;
+
+    --house-a:       #f4f9ff;
+    --house-b:       #eaf1fb;
+    --house-border:  #dbe6f4;
+    --house-cap:     #556;
+    --track:         #d6e0ec;
+
+    --shadow:        rgba(0,0,0,.08);
+    --shadow-strong: rgba(0,0,0,.2);
+    --shadow-banner: rgba(37,107,77,.28);
+    --shadow-pop:    rgba(0,0,0,.25);
+    --thumb-shadow:  rgba(0,0,0,.3);
+
+    /* Typographic scale */
+    --fs-xs:   0.833rem;
+    --fs-sm:   1.0rem;
+    --fs-md:   1.2rem;
+    --fs-lg:   1.44rem;
+
+    /* Spacing scale */
+    --sp-0:   0.125rem;
+    --sp-1:   0.25rem;
+    --sp-2:   0.375rem;
+    --sp-3:   0.5rem;
+    --sp-4:   0.75rem;
+    --sp-5:   1rem;
+    --sp-6:   1.25rem;
+
+    /* Corner radii */
+    --r-xs:   0.125rem;
+    --r-sm:   0.25rem;
+    --r-md:   0.375rem;
+    --r-lg:   0.5rem;
+
+    /* Border, rule widths */
+    --bd:     0.0625rem;
+    --bd-2:   0.125rem;
+    --bd-3:   0.1875rem;
+    --bd-4:   0.3125rem;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+  body {
+    font-family:system-ui,sans-serif,Arial; margin:0; color:var(--text); padding-top:var(--sp-6);
+    font-size:var(--fs-sm);
+    min-height:100vh;
+    background:
+      radial-gradient(40rem 30rem at 8% -5%,   rgba(111,163,201,.82), transparent 90%),
+      radial-gradient(34rem 26rem at 105% 12%, rgba(46,125,91,.62),   transparent 90%),
+      radial-gradient(28rem 24rem at 92% 108%, rgba(217,130,43,.55),  transparent 90%),
+      radial-gradient(30rem 30rem at -8% 85%,  rgba(31,58,95,.55),    transparent 90%),
+      var(--page-bg);
+    background-attachment:fixed;
+  }
+  .wrap { max-width:68.75rem; margin:0 auto; padding:0 var(--sp-4); }
+  .card { background:var(--card-bg); border-radius:var(--r-lg); box-shadow:0 var(--bd-2) var(--sp-3) var(--shadow); padding:var(--sp-6); }
+
+  .sr-only { position:absolute; width:var(--bd); height:var(--bd); padding:0; margin:calc(-1 * var(--bd)); overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
+  .u-dashed { text-decoration:underline dashed; text-underline-offset:var(--bd-3); }
+
+  /* ---------- Text-link style ---------- */
+  .link-dashed {
+    color:inherit;
+    text-decoration:underline dashed;
+    text-underline-offset:var(--bd-3);
+    text-decoration-thickness:var(--bd);
+    transition:filter .15s ease;
+  }
+  .link-dashed:hover { filter:brightness(0.8) }
+
+  :where(.help-trigger, input[type="range"]):focus-visible {
+    outline:var(--bd-2) solid var(--accent); outline-offset:var(--bd-2);
+  }
+
+  .estimate-banner {
+    position:relative; margin:0 auto var(--sp-6); display:grid; grid-template-columns:1fr auto; gap:var(--sp-5); align-items:center;
+    background:
+      radial-gradient(22rem 16rem at 96% -20%,  rgba(255,214,110,.55), transparent 90%),
+      radial-gradient(18rem 14rem at 4% 120%,   rgba(255,196,77,.40),  transparent 90%),
+      radial-gradient(14rem 12rem at 60% 130%,  rgba(255,229,150,.30), transparent 90%),
+      linear-gradient(135deg,var(--green) 0%,var(--green-dark) 100%);
+    border-radius:var(--r-lg);
+    box-shadow:0 var(--sp-1) var(--sp-4) var(--shadow-banner); color:var(--white); padding:var(--sp-5);
+  }
+  .estimate-banner::after {
+    content:''; position:absolute; inset:0; border:var(--bd-2) dashed rgba(255,255,255,.55);
+    border-radius:var(--r-lg); pointer-events:none;
+  }
+  .estimate-banner h1 { margin:0 0 var(--sp-2); font-size:var(--fs-lg); }
+  .estimate-banner p { margin:0; font-size:var(--fs-sm); color:var(--green-text); line-height:1.55; }
+  .estimate-form { display:flex; flex-direction:column; gap:var(--sp-3); }
+  .estimate-form .fld { display:flex; flex-direction:column; }
+  .estimate-form label { font-size:var(--fs-xs); font-weight:700; margin-bottom:var(--sp-1); color:var(--green-tint); }
+  .estimate-form input { padding:var(--sp-3) var(--sp-3); border:var(--bd) solid var(--green-border); border-radius:var(--r-md); font-size:var(--fs-sm); line-height:1.4; max-width:100%; }
+  .estimate-form input#addr { width:100%; min-width:0; }
+  .estimate-form-row { display:flex; gap:var(--sp-3); align-items:flex-end; }
+  .estimate-form .zip-fld { flex:0 0 auto; }
+  .estimate-form input#zip { width:5.625rem; }
+  .estimate-btn { flex:1 1 auto; text-align:center; background:var(--accent); color:var(--white);
+    padding:var(--sp-3) var(--sp-5); border:var(--bd) solid var(--accent-dark);
+    border-radius:var(--r-md); font-size:var(--fs-sm); font-weight:700; line-height:1.4; cursor:pointer; text-decoration:none; white-space:nowrap;
+    box-shadow:0 var(--bd-2) var(--sp-2) var(--shadow-strong); }
+  .estimate-btn:hover { background:var(--accent-dark); }
+
+  .calc-grid { margin:0 auto var(--sp-6); display:grid; grid-template-columns:18rem 1fr; gap:var(--sp-6); align-items:stretch; }
+  .calc-grid > .card { height:100%; min-width:0; }
+  .calc-grid > .card.results { display:flex; flex-direction:column; }
+
+  .field { margin-bottom:var(--sp-5); }
+  .field-label { font-size:var(--fs-sm); font-weight:700; margin-bottom:var(--sp-3); }
+
+  /* ---------- Explanatory labels ---------- */
+  .help { position:relative; display:inline; color:var(--navy) }
+  .help-trigger { cursor:pointer; font-weight:700; color:inherit; transition:filter .15s ease; }
+  .help-trigger:hover { filter:brightness(0.8); }
+  .help-trigger:focus-visible { border-radius:var(--r-xs); }
+  .help-pop { position:absolute; top:1.75rem; left:0; z-index:20; width:15rem; max-width:80vw; background:var(--navy); color:var(--white);
+    font-size:var(--fs-xs); font-weight:400; line-height:1.45; padding:var(--sp-3) var(--sp-4); border-radius:var(--r-md);
+    box-shadow:0 var(--sp-1) var(--sp-4) var(--shadow-pop); display:none; }
+  .help-pop::before { content:''; position:absolute; top:calc(-1 * var(--sp-2)); left:var(--sp-4); border:var(--sp-2) solid transparent;
+    border-top:0; border-bottom-color:var(--navy); }
+  .help.open .help-pop { display:block; }
+
+  input[type="text"].money { width:100%; padding:var(--sp-3); border:var(--bd) solid var(--input-border); border-radius:var(--r-md); font-size:var(--fs-sm); line-height:1.4; }
+
+  .field.inline { display:flex; align-items:center; gap:var(--sp-3); flex-wrap:wrap; font-size:var(--fs-sm); font-weight:700; }
+  .field.inline .chk { display:inline-flex; align-items:center; cursor:pointer; }
+  .field.inline .chk input { cursor:pointer; margin:0; flex:0 0 auto; }
+  .field.inline .occ-emoji { line-height:1; }
+
+  .slider-row { display:flex; align-items:center; gap:var(--sp-4); }
+  .slider-row .val { min-width:3.5rem; font-size:var(--fs-sm); font-weight:700; color:var(--navy); }
+  input[type="range"] { flex:1; min-width:0; -webkit-appearance:none; appearance:none; height:1.5rem; padding:0; margin:0; border-radius:var(--r-sm); background:transparent; outline:none; cursor:pointer; display:block; }
+  input[type="range"]:focus-visible { outline-offset:var(--sp-1); }
+  input[type="range"]::-webkit-slider-runnable-track { height:var(--sp-2); border-radius:var(--r-sm); background:var(--track); }
+  input[type="range"]::-moz-range-track { height:var(--sp-2); border-radius:var(--r-sm); background:var(--track); }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:1.5rem; height:1.5rem; margin-top:calc((var(--sp-2) - 1.5rem) / 2); border-radius:50%; background:var(--navy); cursor:pointer; border:var(--bd-2) solid var(--white); box-shadow:0 var(--bd) var(--bd-3) var(--thumb-shadow); }
+  input[type="range"]::-moz-range-thumb { width:1.5rem; height:1.5rem; border-radius:50%; background:var(--navy); cursor:pointer; border:var(--bd-2) solid var(--white); }
+
+  .assumptions { margin-top:var(--sp-3); padding-top:var(--sp-5); border-top:var(--bd) solid var(--hairline); }
+  .assumptions .title { font-size:var(--fs-sm); font-weight:700; color:var(--navy); margin-bottom:var(--sp-3); }
+  .assumptions .row { display:flex; justify-content:space-between; font-size:var(--fs-sm); color:var(--text-muted); padding:var(--sp-0) 0; }
+
+  .headline-row { display:flex; gap:var(--sp-4); margin-bottom:var(--sp-6); align-items:stretch; flex:0 0 auto; }
+  .result-box { background:var(--panel-bg-2); border-radius:var(--r-lg); padding:var(--sp-5); border-left:var(--bd-4) solid var(--navy);
+    transition:flex-grow .4s ease; overflow:hidden; min-width:9.375rem; }
+  .result-box .lbl { font-size:var(--fs-sm); color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .result-box .val { font-size:var(--fs-lg); font-weight:700; color:var(--navy); margin-top:var(--sp-1); }
+  .highlight { border-left-color:var(--accent); background:var(--accent-soft); }
+  .highlight .val { color:var(--accent); }
+
+  .viz { display:flex; flex-wrap:wrap; gap:var(--sp-4); flex:1 1 auto; min-height:24rem; align-items:stretch; }
+  .viz-left { display:flex; gap:var(--sp-4); flex:1 1 20rem; min-width:0; align-items:stretch; }
+  .house-wrap { flex:0 0 4rem; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:linear-gradient(180deg,var(--house-a) 0%,var(--house-b) 100%); border:var(--bd) solid var(--house-border); border-radius:var(--r-lg); padding:var(--sp-3); }
+  .house-emoji { font-size:4rem; line-height:1; }
+  .house-wrap .cap { font-size:var(--fs-xs); color:var(--house-cap); margin-top:var(--sp-3); text-align:center; }
+  .house-wrap .cap b { color:var(--navy); }
+
+  .bars { flex:1 1 auto; min-width:0; display:flex; gap:var(--sp-2); align-items:stretch; }
+  .bar-col { display:flex; flex-direction:column; align-items:stretch; flex:1 1 0; min-width:3.5rem; flex-grow:var(--w,1); }
+  .bar-col-head { text-align:center; width:100%; display:flex; flex-direction:column; justify-content:flex-end; min-height:2.75rem; margin-bottom:var(--sp-3); }
+  .bar-col-title { font-size:var(--fs-sm); font-weight:700; color:var(--navy); text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bar-col-sub { font-size:var(--fs-xs); color:var(--text-muted); text-align:center; }
+  .stack { width:100%; flex:1; display:flex; flex-direction:column; border-radius:var(--r-md); overflow:hidden; border:var(--bd) solid var(--bar-border); }
+  .bars.multi .bar-col:first-child .stack { border-top-right-radius:0; border-bottom-right-radius:0; }
+  .bars.multi .bar-col:last-child  .stack { border-top-left-radius:0;  border-bottom-left-radius:0; }
+  .seg { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:var(--sp-0) var(--sp-2);
+    color:var(--white); font-size:var(--fs-xs); font-weight:700; text-align:center; overflow:hidden; cursor:pointer; min-height:0;
+    transition:flex-grow .4s ease, filter .15s ease; }
+  .seg:hover { filter:brightness(1.12); }
+  .seg:focus-visible { outline:var(--bd-2) solid var(--white); outline-offset:calc(-1 * var(--sp-1)); }
+  .seg small { font-size:var(--fs-xs); font-weight:400; }
+  .seg .lbl-txt.hide, .seg small.hide { display:none; }
+  .seg.zero { background:var(--zero-bg) !important; color:var(--text-muted); cursor:default; }
+  .seg.zero:hover { filter:none; }
+
+  .info-panel { flex:1 1 18rem; min-width:18rem; background:var(--panel-bg); border:var(--bd) solid var(--border); border-radius:var(--r-lg); padding:var(--sp-5);
+    font-size:var(--fs-sm); line-height:1.5; display:flex; flex-direction:column; overflow:hidden; }
+  .info-panel h4 { margin:0 0 var(--sp-2); font-size:var(--fs-md); }
+  .info-panel .amt { font-size:var(--fs-lg); font-weight:700; margin-bottom:var(--sp-3); }
+  .info-panel .def { color:var(--text-soft); margin-bottom:var(--sp-4); overflow:auto; }
+  .info-panel .calc { background:var(--card-bg); border:var(--bd) solid var(--border-soft); border-radius:var(--r-md); padding:var(--sp-4); flex:0 0 auto; font-size:var(--fs-xs); }
+  .info-panel .calc .row { display:flex; justify-content:space-between; align-items:flex-end; gap:var(--sp-5); padding:var(--sp-0) 0; }
+  .info-panel .calc .row.spacer { height:var(--sp-3); padding:0; }
+  .info-panel .calc .row.line { border-top:var(--bd) solid var(--rule); margin-top:var(--sp-1); padding-top:var(--sp-2); font-weight:700; }
+  .info-panel .calc .row.dbl { border-top:var(--bd-3) double var(--rule); margin-top:var(--sp-1); padding-top:var(--sp-2); font-weight:700; }
+  .info-panel .hint { color:var(--text-faint); margin:auto; text-align:center; }
+  .info-content { flex:1 1 auto; min-height:0; display:flex; flex-direction:column; user-select:text; }
+
+  .disclaimer { max-width:68.75rem; margin:0 auto var(--sp-6); padding:0 var(--sp-2); font-size:var(--fs-xs); color:var(--text-muted); line-height:1.55; }
+  .disclaimer strong { font-weight:700; }
+
+  .faq { margin:0 auto var(--sp-6); scroll-margin-top:var(--sp-5); }
+  .faq-panel { background:var(--card-bg); border:var(--bd) solid var(--border); border-radius:var(--r-lg); overflow:hidden; }
+  .faq-panel h2 { font-size:var(--fs-lg); color:var(--navy); margin:0; padding:var(--sp-5) var(--sp-5) var(--sp-4); }
+  .faq details { border-top:var(--bd) solid var(--hairline); }
+  .faq summary { list-style:none; cursor:pointer; padding:var(--sp-4) var(--sp-5); font-weight:700; font-size:var(--fs-sm); color:var(--navy);
+    display:flex; justify-content:space-between; align-items:center; transition:background .15s ease; }
+  .faq summary::-webkit-details-marker { display:none; }
+  .faq summary::after { content:'+'; font-size:var(--fs-md); font-weight:700; color:var(--green-dark); margin-left:var(--sp-5); }
+  .faq details[open] summary { background:var(--accent-soft); color:var(--accent); }
+  .faq details[open] summary::after { content:'\2212'; color:var(--accent); }
+  .faq details[open] .answer { background:var(--accent-soft); }
+  .faq .answer { padding:0 var(--sp-5) var(--sp-4); font-size:var(--fs-sm); color:var(--text-soft); line-height:1.55; scroll-margin-top:var(--sp-5); }
+
+  .site-footer { max-width:68.75rem; margin:0 auto var(--sp-6); padding:0 var(--sp-2) var(--sp-6); font-size:var(--fs-xs); color:var(--text-muted); line-height:1.9; }
+  .site-footer a:not(.link-dashed) { color:var(--green-dark); text-decoration:none; }
+  .site-footer a:not(.link-dashed):hover { text-decoration:underline; }
+  .site-footer img.lic-badge { height:1.1em; vertical-align:-0.2em; transition:filter .15s ease; }
+  .site-footer a:hover img.lic-badge { filter:brightness(0.8); }
+
+  @media (max-width:56.25rem){
+    .estimate-banner{grid-template-columns:1fr;} .calc-grid{grid-template-columns:1fr;}
+    .viz{min-height:0;}
+    .viz-left{flex:1 1 100%; min-height:16rem;}
+    .house-wrap{flex:0 0 auto;}
+    .info-panel{flex:1 1 100%; min-width:0; min-height:0}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="estimate-banner">
+    <div>
+      <h1>Let <a class="link-dashed" href="#faq-who">Jake</a> make you an offer <span aria-hidden="true">📬</span></h1>
+      <p>I hope you find this calculator helpful. I purchase occupied remainder interests for fair cash value and hold them for the long term. If you are interested in selling your remainder interest, get in touch with me. You can find immediate answers to <a class="link-dashed" href="#faq">frequently asked questions</a> below. Email me at <a class="link-dashed" href="mailto:remainderinterest@proton.me">remainderinterest@proton.me</a></p>
+    </div>
+    <form class="estimate-form" onsubmit="return false;">
+      <div class="fld"><label for="addr">Property address</label>
+        <input type="text" id="addr" autocomplete="street-address" placeholder="3764 Elvis Presley Blvd, Memphis, TN"></div>
+      <div class="estimate-form-row">
+        <div class="fld zip-fld"><label for="zip">ZIP</label>
+          <input type="text" id="zip" autocomplete="postal-code" inputmode="numeric" placeholder="38116"></div>
+        <a class="estimate-btn" id="estimateBtn" href="#">Request an offer</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="calc-grid">
+    <!-- Inputs -->
+    <div class="card">
+      <div class="field">
+        <div class="field-label"><span aria-hidden="true">👤</span> <span class="help"><span class="help-trigger u-dashed" role="button" tabindex="0" aria-expanded="false" data-help="How old is the person named in the life estate, even if living elsewhere?">Age of life estate occupant</span><span class="help-pop" role="tooltip"></span></span></div>
+        <div class="slider-row"><input type="range" id="age1" min="15" max="105" step="1" value="70" aria-label="Age of life estate occupant"><span class="val" id="age1Val">70 yrs</span></div>
+      </div>
+
+      <div class="field inline">
+        <span class="occ-emoji" aria-hidden="true">👥</span>
+        <span class="help"><span class="help-trigger u-dashed" role="button" tabindex="0" aria-expanded="false" data-help="Does the life estate cover two people, both of whom are living? This is most likely if the property was jointly purchased or if the life estate was originally created by a couple.">Second occupant</span><span class="help-pop" role="tooltip"></span></span>
+        <label class="chk" for="secondOccupant"><span class="sr-only">Add a second life estate occupant</span><input type="checkbox" id="secondOccupant"></label>
+      </div>
+
+      <div class="field" id="age2Wrap" style="display:none;">
+        <div class="field-label"><span aria-hidden="true">👥</span> <span class="help"><span class="help-trigger u-dashed" role="button" tabindex="0" aria-expanded="false" data-help="How old is the second person named in the life estate, even if living elsewhere?">Age of second occupant</span><span class="help-pop" role="tooltip"></span></span></div>
+        <div class="slider-row"><input type="range" id="age2" min="15" max="105" step="1" value="70" aria-label="Age of second occupant"><span class="val" id="age2Val">70 yrs</span></div>
+      </div>
+
+      <div class="field"><div class="field-label"><span aria-hidden="true">🏠</span> <span class="help"><span class="help-trigger u-dashed" role="button" tabindex="0" aria-expanded="false" data-help="How much is the structure currently worth, by itself? You can usually find this on public property tax assessments (often labeled ‘improvements’) or by subtracting the price of a comparable vacant lot from total property value.">Building value</span><span class="help-pop" role="tooltip"></span></span></div>
+        <label class="sr-only" for="building">Building value in dollars</label>
+        <input type="text" class="money" id="building" inputmode="numeric" value="$300,000"></div>
+
+      <div class="field"><div class="field-label"><span aria-hidden="true">🌳</span> <span class="help"><span class="help-trigger u-dashed" role="button" tabindex="0" aria-expanded="false" data-help="How much would the ‘unimproved’ lot currently be worth? You can usually find this listed on public property tax assessments or neighboring lot or tear-down sales.">Land value</span><span class="help-pop" role="tooltip"></span></span></div>
+        <label class="sr-only" for="land">Land value in dollars</label>
+        <input type="text" class="money" id="land" inputmode="numeric" value="$200,000"></div>
+
+      <div class="field">
+        <div class="field-label"><span aria-hidden="true">⏳</span> <span class="help"><span class="help-trigger u-dashed" role="button" tabindex="0" aria-expanded="false" data-help="How many more years until the home will need a major renovation? A good rule-of-thumb is to assume one is required every 25 years.">Building useful life remaining</span><span class="help-pop" role="tooltip"></span></span></div>
+        <div class="slider-row"><input type="range" id="useful" min="5" max="40" step="1" value="25" aria-label="Building useful life remaining in years"><span class="val" id="usefulVal">25 yrs</span></div>
+      </div>
+
+      <div class="field">
+        <div class="field-label"><span aria-hidden="true">🛠️</span> <span class="help"><span class="help-trigger u-dashed" role="button" tabindex="0" aria-expanded="false" data-help="How much (as a share of current building value) will it cost for a full renovation, when needed? Be sure to consider interior work and system overhauls.">Reconstruction cost</span><span class="help-pop" role="tooltip"></span></span></div>
+        <div class="slider-row"><input type="range" id="reno" min="30" max="100" step="1" value="80" aria-label="Reconstruction cost as a percentage"><span class="val" id="renoVal">80%</span></div>
+      </div>
+
+      <div class="assumptions">
+        <div class="title"><span aria-hidden="true">🏦</span> Interest rate assumptions</div>
+        <div class="row"><span>I.R.C. &sect; 7520 rate</span><span id="a7520"></span></div>
+        <div class="row"><span>Funding spread</span><span id="aSpread"></span></div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="card results">
+      <div class="headline-row" aria-live="polite">
+        <div class="result-box highlight" id="boxRem"><div class="lbl"><span aria-hidden="true">🔑</span> Remainder interest</div><div class="val" id="rValue">&mdash;</div></div>
+        <div class="result-box" id="boxLife"><div class="lbl"><span aria-hidden="true">📆</span> Life estate</div><div class="val" id="rLife">&mdash;</div></div>
+      </div>
+      <div class="viz">
+        <div class="viz-left">
+          <div class="house-wrap"><div class="house-emoji" role="img" aria-label="Property">🏡</div>
+            <div class="cap">Total<br><b id="capTotal">&mdash;</b></div></div>
+          <div class="bars" id="bars"></div>
+        </div>
+        <div class="info-panel" role="region" aria-label="Segment detail">
+          <div class="hint" id="infoHint">Tap a segment, or hover, for more detail.</div>
+          <div class="info-content" id="infoContent" style="display:none;">
+            <h4 id="infoTitle"></h4><div class="amt" id="infoAmt"></div>
+            <div class="def" id="infoDef"></div><div class="calc" id="infoCalc"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="faq" id="faq">
+    <div class="faq-panel">
+      <h2><span aria-hidden="true">🎱 </span><span class="help"><span class="help-trigger u-dashed" role="button" tabindex="0" aria-expanded="false" data-help="My best answers to questions that either come up often or should come up more often!">Frequently asked questions</span><span class="help-pop" role="tooltip"></span></span></h2>
+
+      <details name="faq">
+        <summary id="faq-who">Who are you?</summary>
+        <div class="answer">Good question. I’m an amateur data analyst who loves tackling difficult problems. I previously worked as an investor for nonprofit foundations and love learning about unusual assets. I believe it should be easier to buy and sell deeded remainder interests, which have existed for hundreds of years. I seek to build a portfolio of remainder interests, while hopefully connecting potential sellers with additional interested buyers (if this is you, reach out to me). I’m one person with a very patient wife, a day job, and a foster cat; there’s no private equity or startup funding involved here.</div>
+      </details>
+
+      <details name="faq">
+        <summary>What are remainder interests?</summary>
+        <div class="answer">A remainder interest is the deeded right to possess a property, following the end of a life estate. Remainder interests are typically created in estate planning when a person gifts, donates, or sells a home while maintaining the right to live in the home for a lifetime (a ‘life estate’). Unlike a declaration in a will, remainder interests are typically irrevocable and assignable.</div>
+      </details>
+
+      <details name="faq">
+        <summary>What is a life estate?</summary>
+        <div class="answer">A life estate is the right to use and occupy a property for a lifetime. When the life estate ends, the property passes along (in ‘as-is’ condition) to the holder of the remainder interest. A life estate may span the lives of two occupants, in which case the life estate will continue for the length of the longer lifetime.</div>
+      </details>
+
+      <details name="faq">
+        <summary>How does the calculator work?</summary>
+        <div class="answer">As well as it can! The calculator applies simplified actuarial methods that consider life expectancy, the time value of money (via interest rate assumptions), and the rate of property depreciation. The calculation is similar to those referenced in IRS rules, publications, and guidance but is not an implementation of any tax rule or professional valuation methodology. It should not be relied upon or used in place of professional advice. It only expresses my personal opinion on what a hypothetical property interest may be worth, providing directional approximation for a set of input characteristics.</div>
+      </details>
+
+      <details name="faq">
+        <summary>Why are land and building values split?</summary>
+        <div class="answer">Land does not depreciate, so the difference in value between current and future use reflects differences in time value. A building wears out over long periods of time and passes along in ‘as-is’ condition. Therefore, in addition to greater time value, the life estate gets more benefit from the remaining useful life of the building than the remainder interest does. In order to enjoy the house in its current condition, the remainder interest holder will have to pay for renovations equivalent to the depreciation that occurs in the meantime.</div>
+      </details>
+
+      <details name="faq">
+        <summary>Can all remainder interests be sold?</summary>
+        <div class="answer">No, certain remainder interests may be revoked by the life estate holder. This may apply in Texas, Florida, Texas, Michigan, West Virginia, and Vermont. Fractional remainder interests may also be tricky. Local law, property condition, deed terms, and geographic factors will determine whether a remainder interest actually has marketable value.</div>
+      </details>
+
+      <details name="faq">
+        <summary>What is the interest rate assumption?</summary>
+        <div class="answer">The calculator relies on a fixed interest rate assumption that I periodically update. It broadly mirrors the IRS Section 7520 rate, with the addition of a funding spread. This spread is included to account for delayed updates (sorry!), an upward sloping U.S. Treasury yield curve, and the difference between market cost of capital and the IRS statutory rate. It incorporates a buffer for illiquidity and unique risks that must be continually monitored, such as total loss from foreclosure if the life estate holder lapses on property tax bills. The funding spread nudges the calculation toward marketable reality, while also discouraging you from inappropriately relying on it for tax purposes.</div>
+      </details>
+
+      <details name="faq">
+        <summary>I’m older than 105.</summary>
+        <div class="answer">Congratulations! That’s an incredible accomplishment; unfortunately, I can only maintain the calculator for the most common potential inputs. If it fails to work for you, please reach out to me 🎂</div>
+      </details>
+
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+  <div class="disclaimer">
+    <strong>Disclaimer</strong>: For informational purposes only. This tool provides general information not specific to any property; it produces neither appraisals nor valuations. It provides no legal, tax, financial, or accounting advice; no professional relationship is established through its use. Nothing communicated herein constitutes an offer, solicitation of an offer, or terms of a potential future offer. Do not rely on these figures for tax, valuation, sale, contracting, or any other purposes. All information expressed represents personal opinion. Nothing expressed here should be taken as a statement of fact; it may (and likely does) contain typographical, mathematical, and conceptual errors. Consult a qualified appraiser, attorney, or tax advisor. I am not a lawyer and am certainly not your lawyer!
+  </div>
+
+<footer class="site-footer">
+  &copy; 2026. All rights reserved.
+  🎨 Design and page content licensed under
+  <a href="https://creativecommons.org/licenses/by-nc/4.0/legalcode" target="_blank" rel="noopener license">
+    <img class="lic-badge" src="https://mirrors.creativecommons.org/presskit/buttons/88x31/svg/by-nc.svg"
+         alt="CC BY-NC 4.0"></a>.
+  🦀 Code licensed under
+  <a href="https://www.gnu.org/licenses/agpl-3.0.html#license-text" target="_blank" rel="noopener license">
+    <img class="lic-badge" src="https://upload.wikimedia.org/wikipedia/commons/0/06/AGPLv3_Logo.svg" alt="AGPL 3.0"></a>.
+  🖥️ <a id="viewSrc" class="link-dashed" href="#" rel="noopener">View source</a>.
+  🦬 Go Bills.
+</footer>
+</div>
+
+<script>
+/* ---------- Rate ---------- */
+const AFR = 0.045, SEC7520_FACTOR = 1.20, FUNDING_SPREAD = 0.023;
+const RATE = AFR * SEC7520_FACTOR + FUNDING_SPREAD;
+const MAX_VALUE = 9999999;
+
+/* ---------- Mortality (2023) ---------- */
+const MIN_AGE = 15, OMEGA = 110;
+const lxData = [
+99145.34, 99111.91, 99070.69, 99021.50, 98964.16,   // 15–19
+98898.61, 98824.20, 98741.32, 98652.16, 98559.87,   // 20–24
+98466.80, 98373.71, 98280.09, 98185.51, 98089.05,   // 25–29
+97989.90, 97887.47, 97781.58, 97672.13, 97559.20,   // 30–34
+97442.53, 97321.14, 97193.66, 97058.84, 96915.25,   // 35–39
+96761.20, 96595.51, 96416.30, 96220.61, 96005.41,   // 40–44
+95768.60, 95509.98, 95229.06, 94923.45, 94589.88,   // 45–49
+94225.50, 93828.33, 93398.01, 92934.52, 92438.08,   // 50–54
+91907.95, 91342.02, 90737.24, 90090.97, 89401.06,   // 55–59
+88665.95, 87883.66, 87051.88, 86167.86, 85226.77,   // 60–64
+84221.59, 83142.34, 81978.28, 80728.83, 79387.95,   // 65–69
+77957.53, 76429.84, 74797.63, 73049.33, 71177.55,   // 70–74
+69174.83, 67044.59, 64773.93, 62366.05, 59795.50,   // 75–79
+57080.84, 54213.71, 51205.27, 48059.88, 44808.51,   // 80–84
+41399.79, 37895.25, 34313.98, 30700.82, 27106.68,   // 85–89
+23586.75, 20198.02, 16996.17, 14032.08, 11348.23,   // 90–94
+8975.661, 6931.559, 5218.261, 3823.642, 2722.994,   // 95–99
+1882.108, 1261.083, 818.2641, 513.7236, 311.8784,   // 100–104
+183.0200, 103.8046, 56.91106, 30.17214, 15.47804,   // 105–109
+0.000000                                            // 110
+];
+const L = age => (age >= OMEGA ? 0 : lxData[age - MIN_AGE]);
+
+/*    § 1.170A-12; § 20.2031-7    */
+const clamp = x => Math.max(0, Math.min(1, x));
+const v = n => Math.pow(1 + RATE, -n);
+
+function survivorship(t, twoLives, x, y){
+  const sx = L(x + t) / (L(x) || 1);
+  if (!twoLives) return sx;
+  const sy = L(y + t) / (L(y) || 1);
+  return 1 - (1 - sx) * (1 - sy);
+}
+
+/*    (1 - RI) = (i/2) · Σ_{t≥0} v^(t+1) [S(t) + S(t+1)]    */
+function remainderFactor(twoLives, x, y){
+  let s = 0, prev = survivorship(0, twoLives, x, y);
+  for (let t = 0; prev > 0 && t <= OMEGA; t++){
+    const nxt = survivorship(t + 1, twoLives, x, y);
+    s += v(t + 1) * (prev + nxt);
+    prev = nxt;
+  }
+  return clamp(1 - (RATE / 2) * s);
+}
+
+/*    § 1.170A-12; DRF = (1 + i/2) · Σ_{t=0}^{n-1} v^(t+1) [S(t) − S(t+1)] (1 − 1/(2n) − t/n)    */
+function depreciationRemFactor(twoLives, x, y, n){
+  let sum = 0, cur = survivorship(0, twoLives, x, y);
+  for (let t = 0; t < n; t++){
+    const nxt  = survivorship(t + 1, twoLives, x, y);
+    const frac = 1 - 1 / (2 * n) - t / n;
+    sum += v(t + 1) * (cur - nxt) * frac;
+    cur = nxt;
+  }
+  return clamp((1 + RATE / 2) * sum);
+}
+
+/* ---------- Formatting ---------- */
+const fmt = n => '$' + Math.round(n).toLocaleString();
+const pct = r => (r * 100).toFixed(2) + '%';
+const fac = f => f.toFixed(5);
+const parseMoney = s => Math.min(MAX_VALUE, +String(s).replace(/[^0-9.]/g, '') || 0);
+const el = id => document.getElementById(id);
+
+/* Three-row block for the detail panel. */
+const mul = (baseL, baseV, facL, facV, outL, outV, outCls) =>
+  [[baseL, fmt(baseV)], [facL, '×\u00A0' + fac(facV)], [outL, fmt(outV), outCls || 'line']];
+const SPACER = ['', '', 'spacer'];
+
+/* ---------- Palette bridge ---------- */
+const cssVar = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const COLORS = {
+  landLE:    cssVar('--seg-use'), landRem:  cssVar('--accent'),
+  bldgResLE: cssVar('--seg-use'), bldgDepLE:cssVar('--seg-dep'), bldgRem:cssVar('--accent')
+};
+let segData = {};
+
+/* ---------- Detail panel ---------- */
+function resetInfo(){
+  segData = {};
+  el('infoContent').style.display = 'none';
+  el('infoHint').style.display = 'block';
+}
+
+function showInfo(key){
+  const s = segData[key]; if (!s) return;
+  const color = COLORS[key];
+  el('infoHint').style.display = 'none';
+  el('infoContent').style.display = 'flex';
+  const t = el('infoTitle');
+  t.textContent = `${key.endsWith('Rem') ? 'Remainder' : 'Life estate'}: ${s.label}`;
+  t.style.color = color;
+  const a = el('infoAmt'); a.textContent = fmt(s.amt); a.style.color = color;
+  el('infoDef').innerHTML = s.def;
+  el('infoCalc').innerHTML = s.calc.map(r =>
+    r[2] === 'spacer'
+      ? '<div class="row spacer"></div>'
+      : `<div class="row${r[2] ? ' ' + r[2] : ''}"><span>${r[0]}</span><span>${r[1]}</span></div>`
+  ).join('');
+}
+
+/* ---------- Calculate, render ---------- */
+function calculate(){
+  resetInfo();
+
+  const twoLives = el('secondOccupant').checked;
+  const x        = +el('age1').value;
+  const y        = +el('age2').value;
+  const building = parseMoney(el('building').value);
+  const land     = parseMoney(el('land').value);
+  const renoNum  = +el('reno').value;
+  const D        = +el('useful').value || 1;
+  const total    = land + building;
+
+  el('age1Val').textContent   = x + ' yrs';
+  el('age2Val').textContent   = y + ' yrs';
+  el('renoVal').textContent   = renoNum + '%';
+  el('usefulVal').textContent = D + ' yrs';
+
+  el('age1').setAttribute('aria-valuetext', `${x} years old`);
+  el('age2').setAttribute('aria-valuetext', `${y} years old`);
+  el('reno').setAttribute('aria-valuetext', `${renoNum} percent`);
+  el('useful').setAttribute('aria-valuetext', `${D} years`);
+
+  const residualVal = building * (1 - renoNum / 100);
+  const depBase     = building - residualVal;
+
+  const R = remainderFactor(twoLives, x, y);
+  const C = depreciationRemFactor(twoLives, x, y, D);
+
+  const landRem = land * R,        landLE = land - landRem;
+  const bResRem = residualVal * R, bResLE = residualVal - bResRem;
+  const bDepRem = depBase * C,     bDepLE = depBase - bDepRem;
+  const bldgRem = bResRem + bDepRem;
+
+  const remTotal  = landRem + bResRem + bDepRem;
+  const lifeTotal = landLE + bResLE + bDepLE;
+
+  el('rValue').textContent   = fmt(remTotal);
+  el('rLife').textContent    = fmt(lifeTotal);
+  el('capTotal').textContent = fmt(total);
+  el('boxRem').style.flexGrow  = Math.max(0.0001, remTotal  / (total || 1));
+  el('boxLife').style.flexGrow = Math.max(0.0001, lifeTotal / (total || 1));
+
+  const columns = [
+    { title:'🌳 Land', value:land, segs:[
+      { key:'landLE', label:'Current use', amt:landLE,
+        def:`Value of the life estate's right to use the land for the occupant's lifetime.`,
+        calc: mul('Land value', land, 'Life estate factor', 1 - R, 'Land current use value', landLE) },
+      { key:'landRem', label:'Future possession', amt:landRem,
+        def:`Today's value of the land's future use (following life estate occupancy).`,
+        calc: mul('Land value', land, 'Remainder factor', R, 'Land future use value', landRem) }
+    ]},
+    { title:'🏠 Building', value:building, segs:[
+      { key:'bldgDepLE', label:'Expected depreciation', amt:bDepLE,
+        def:`Expected wear and tear on the home; future renovation costs. Aging of systems and interior. Useful life expected to be enjoyed by the occupant.`,
+        calc: mul('Depreciable portion', depBase, '(1 - Depreciation remainder)', 1 - C, 'Expected depreciation', bDepLE) },
+      { key:'bldgResLE', label:'Current use', amt:bResLE,
+        def:`Value of the life estate's use of permanent, structural parts of the home.`,
+        calc: mul('Residual building value', residualVal, 'Life estate factor', 1 - R, 'Structure current use value', bResLE) },
+      { key:'bldgRem', label:'Future possession', amt:bldgRem,
+        def: residualVal > 0
+          ? `Today's value of receiving the home after the life estate ends. Includes depreciable and permanent portions.`
+          : `Today's value of receiving the home after the life estate ends. Unused useful life of the building.`,
+        calc: residualVal > 0
+          ? [
+              ...mul('Depreciable portion', depBase, 'Depreciation remainder factor', C, 'Unused useful life', bDepRem),
+              SPACER,
+              ...mul('Residual building value', residualVal, 'Remainder factor', R, 'Structure future use value', bResRem),
+              SPACER,
+              ['Total future use value', fmt(bldgRem), 'dbl']
+            ]
+          : mul('Depreciable portion', depBase, 'Depreciation remainder factor', C, 'Unused useful life', bDepRem) }
+    ]}
+  ];
+
+  renderBars(columns, total);
+}
+
+function renderBars(columns, total){
+  const bars = el('bars'); bars.innerHTML = '';
+
+  const visible = columns.filter(c => c.value > 0);
+  bars.classList.toggle('multi', visible.length > 1);
+
+  const cols = visible.length ? visible : columns;
+
+  cols.forEach(col => {
+    const narrow = total > 0 ? (col.value / total) < 0.33 : false;
+    const colEl = document.createElement('div');
+    colEl.className = 'bar-col';
+    colEl.style.setProperty('--w', total > 0 ? (col.value / total) : 1);
+    colEl.innerHTML = `<div class="bar-col-head"><div class="bar-col-title">${col.title}</div>
+      <div class="bar-col-sub">${fmt(col.value)}</div></div><div class="stack"></div>`;
+    const stack = colEl.querySelector('.stack');
+
+    const active = col.segs.filter(s => s.amt > 0);
+    if (col.value <= 0 || active.length === 0){
+      const seg = document.createElement('div');
+      seg.className = 'seg zero'; seg.style.flexGrow = 1;
+      seg.innerHTML = narrow ? '' : '<span class="lbl-txt">$0</span>';
+      stack.appendChild(seg);
+    } else {
+      active.forEach(s => {
+        segData[s.key] = s;
+        const seg = document.createElement('div');
+        seg.className = 'seg';
+        seg.tabIndex = 0;
+        seg.setAttribute('role', 'button');
+        seg.setAttribute('aria-label',
+          `${s.key.endsWith('Rem') ? 'Remainder' : 'Life estate'}: ${s.label}, ${fmt(s.amt)}`);
+        seg.style.background = COLORS[s.key];
+        seg.style.flexGrow = s.amt / col.value;
+        seg.innerHTML = `<span class="lbl-txt${narrow?' hide':''}">${s.label}</span>` +
+                        `<small class="${narrow?'hide':''}">${fmt(s.amt)}</small>`;
+        seg.addEventListener('mouseenter', () => showInfo(s.key));
+        seg.addEventListener('click', () => showInfo(s.key));
+        seg.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); showInfo(s.key); }
+        });
+        stack.appendChild(seg);
+      });
+    }
+    bars.appendChild(colEl);
+  });
+}
+
+/* ---------- Money input ---------- */
+function formatMoneyInput(input){
+  const d = input.value.replace(/[^0-9]/g, '');
+  input.value = d ? '$' + Math.min(MAX_VALUE, Number(d)).toLocaleString() : '';
+}
+
+/* ---------- Email link ---------- */
+function updateEstimateLink(){
+  const twoLives = el('secondOccupant').checked;
+  const lines = [
+    'Hello,', '', 'I hold a remainder interest and would like to request an offer.', '',
+    `Property address: ${el('addr').value.trim() || '[address]'}`,
+    `ZIP: ${el('zip').value.trim() || '[zip]'}`, '',
+    'Details I entered in the calculator:',
+    `- Number of occupants: ${twoLives ? 2 : 1}`,
+    `- Age of life estate occupant: ${el('age1').value}`,
+    ...(twoLives ? [`- Age of second occupant: ${el('age2').value}`] : []),
+    `- Building value: ${fmt(parseMoney(el('building').value))}`,
+    `- Land value: ${fmt(parseMoney(el('land').value))}`,
+    `- Building useful life remaining: ${el('useful').value} years`,
+    `- Reconstruction cost: ${el('reno').value}%`,
+    '', 'Thank you.'
+  ];
+  el('estimateBtn').href = `mailto:remainderinterest@proton.me?subject=${encodeURIComponent('Remainder interest — request for offer')}&body=${encodeURIComponent(lines.join('\n'))}`;
+}
+
+/* ---------- Explanatory labels ---------- */
+function closeAllHelp(){
+  document.querySelectorAll('.help.open').forEach(o => {
+    o.classList.remove('open');
+    o.querySelector('.help-trigger').setAttribute('aria-expanded', 'false');
+  });
+}
+document.querySelectorAll('.help .help-trigger').forEach(trigger => {
+  const wrap = trigger.closest('.help');
+  wrap.querySelector('.help-pop').textContent = trigger.dataset.help || '';
+  const toggle = e => {
+    e.stopPropagation();
+    const isOpen = wrap.classList.contains('open');
+    closeAllHelp();
+    if (!isOpen){ wrap.classList.add('open'); trigger.setAttribute('aria-expanded', 'true'); }
+  };
+  trigger.addEventListener('click', toggle);
+  trigger.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(e); }
+    else if (e.key === 'Escape'){ closeAllHelp(); }
+  });
+});
+document.addEventListener('click', closeAllHelp);
+
+/* ---------- FAQ accordion ---------- */
+document.querySelectorAll('.faq details').forEach(d =>
+  d.addEventListener('toggle', () => {
+    if (d.open) document.querySelectorAll('.faq details').forEach(o => { if (o !== d) o.open = false; });
+  }));
+
+/* ---------- Wiring ---------- */
+el('a7520').innerHTML     = `${pct(AFR)} &middot; ${SEC7520_FACTOR}`;
+el('aSpread').textContent = pct(FUNDING_SPREAD);
+el('viewSrc').setAttribute('href', 'view-source:' + location.href);
+
+el('secondOccupant').addEventListener('change', () => {
+  el('age2Wrap').style.display = el('secondOccupant').checked ? 'block' : 'none';
+  calculate(); updateEstimateLink();
+});
+
+['building','land'].forEach(id => {
+  el(id).addEventListener('input', () => { formatMoneyInput(el(id)); calculate(); updateEstimateLink(); });
+  el(id).addEventListener('focus', function(){ const t = this; setTimeout(() => t.select(), 0); });
+  el(id).addEventListener('mouseup', e => e.preventDefault());
+});
+['age1','age2','reno','useful'].forEach(id =>
+  el(id).addEventListener('input', () => { calculate(); updateEstimateLink(); }));
+['addr','zip'].forEach(id => el(id).addEventListener('input', updateEstimateLink));
+
+calculate();
+updateEstimateLink();
+</script>
+</body>
+</html>
